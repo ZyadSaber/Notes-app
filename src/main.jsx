@@ -1,41 +1,43 @@
-import ReactMarkdown from "react-markdown";
+import { memo, useCallback } from "react";
 
-function Main({activenote, onupdatenote}){
+const Main = ({ activeNote, onChange, viewNote }) => {
+  const { title, body } = activeNote;
+  const {title: showTitle, body: showBody} = viewNote
 
-    const oneditfield = (key, value) => {
-        onupdatenote({
-            ...activenote,
-            [key]: value,
-            lastModified: Date.now()
-        })
-    }
+  const handleInputChange = useCallback(
+    (name) =>
+      ({ target: { value } }) => {
+        onChange({
+          name,
+          value,
+        });
+      },
+    [onChange]
+  );
 
-    if (!activenote) return <div className="no-active-note">No Note is selected</div>
-
- return(
+  return (
     <div className="app-main">
-        <div className="app-main-note-edit">
-             <input
+      <div className="app-main-note-edit">
+        <input
           type="text"
           id="title"
-          placeholder="Note Title"
-          value={activenote.title}
-          onChange={(e) => oneditfield("title", e.target.value)}
           autoFocus
+          onChange={handleInputChange("title")}
+          value={title}
         />
-            <textarea
+        <textarea
           id="body"
           placeholder="Write your note here..."
-          value={activenote.body}
-          onChange={(e) => oneditfield("body", e.target.value)}
+          onChange={handleInputChange("body")}
+          value={body}
         />
-        </div>
-        <div className="app-app-main-note-preview">
-            <h1 className="preview-title">{activenote.title}</h1>
-            <ReactMarkdown className="markdown-preview">{activenote.body}</ReactMarkdown>
-        </div>
+      </div>
+      <div className="app-app-main-note-preview">
+        <h1 className="preview-title">{showTitle}</h1>
+        <div className="markdown-preview">{showBody}</div>
+      </div>
     </div>
-    )
-}
+  );
+};
 
-export default Main;
+export default memo(Main);

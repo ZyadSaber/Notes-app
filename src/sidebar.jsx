@@ -1,33 +1,40 @@
-function Sidebar({ notes, onAddNote, onDeleteNote, activenote, setactivenote }){
+import { memo } from "react";
 
-    const sort = notes.sort((a, b) => b.lastModified - a.lastModified)
-
-return (
-    <div className="app-sidebar">
-        <div className="app-sidebar-header">
-            <h1>Notes</h1>
-            <button onClick={onAddNote}>Add</button>
-        </div>
-        <div className="app-sidebar-notes">
-            {
-                sort.map((note) => (
-                    <div className={`app-sidebar-note ${note.id === activenote && "active"}`} onClick={() => setactivenote(note.id)}>
-                <div className="sidebar-note-title">
-                    <strong>{note.title}</strong>
-                    <button onClick={() => onDeleteNote(note.id)} >Delete</button>
-                </div>
-                <p>{note.body}</p>}
-                <small className="note-meta">last modified {new Date(note.lastModified).toLocaleDateString("en-GB",{
-                    hour: "2-digit",
-                    minute: "2-digit"
-                })}
-                </small>
-            </div>
-                ))
-            }
-        </div>
+const Sidebar = ({
+  notes,
+  onAddSaveButton,
+  onDeleteNote,
+  selectedId,
+  setActiveNote,
+  setViewNote,
+  activeRecord
+}) => (
+  <div className="app-sidebar">
+    <div className="app-sidebar-header">
+      <h1>Notes</h1>
+      <button onClick={onAddSaveButton}>{selectedId ? "Save" : "Add"}</button>
     </div>
-)
-}
+    <div className="app-sidebar-notes">
+      {notes.map((record) => {
+        const { body, id, title, lastModified } = record;
+        return (
+          <div
+            className={`app-sidebar-note ${activeRecord === id && "active"}`}
+            key={id}
+            onClick={() => setViewNote(record)}
+            onDoubleClick={()=>setActiveNote(record)}
+          >
+            <div className="sidebar-note-title">
+              <strong>{title}</strong>
+              <button onClick={() => onDeleteNote(id)}>Delete</button>
+            </div>
+            <p>{body}</p>
+            <small className="note-meta">last modified [{lastModified}]</small>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
 
-export default Sidebar;
+export default memo(Sidebar);
